@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIFF 動作確認</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --line: #d7dde5;
+    --ink: #16233a;
+    --sub: #55657d;
+    --ok: #1a7f4b;
+    --ng: #b3261e;
+    --warn: #a35a00;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; padding: 16px 14px 60px;
+    background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 16px; line-height: 1.65;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .lead { color: var(--sub); font-size: 13px; margin: 0 0 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px; margin-bottom: 14px;
+  }
+  .card h2 {
+    font-size: 15px; margin: 0 0 10px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .row { display: flex; gap: 10px; padding: 5px 0; align-items: flex-start; }
+  .k { flex: 0 0 40%; color: var(--sub); font-size: 13px; }
+  .v { flex: 1; word-break: break-all; font-size: 14px; font-weight: 600; }
+  .v.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 500; }
+  .empty { color: var(--sub); font-weight: 400; }
+  .verdict { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+  .verdict:last-child { border-bottom: 0; }
+  .mark { flex: 0 0 26px; font-size: 19px; font-weight: 700; text-align: center; }
+  .ok { color: var(--ok); } .ng { color: var(--ng); } .warn { color: var(--warn); }
+  .vt { font-size: 14px; }
+  .vn { font-size: 12px; color: var(--sub); }
+  .banner {
+    border-radius: 10px; padding: 11px 13px; margin-bottom: 14px;
+    font-size: 14px; font-weight: 600;
+  }
+  .banner.err { background: #fdecea; color: var(--ng); border: 1px solid #f3c2bd; }
+  .banner.info { background: #e8f0fb; color: #1c4f9c; border: 1px solid #c2d6f0; }
+  button {
+    width: 100%; padding: 14px; font-size: 16px; font-weight: 700;
+    border: 0; border-radius: 10px; background: #06c755; color: #fff;
+    margin-top: 6px; cursor: pointer;
+  }
+  button.sub { background: #52627a; }
+  pre {
+    background: #f0f2f5; border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px; font-size: 11.5px; overflow-x: auto; margin: 0;
+    white-space: pre-wrap; word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<h1>LIFF 動作確認</h1>
+<p class="lead">
+  LIFF ID は下のいずれかで指定します。<br>
+  ① このファイルの <code>LIFF_ID</code> を書き換える<br>
+  ② URL に <code>?liffId=xxxxxxx-xxxxxxxx</code> を付ける
+</p>
+
+<div id="banner"></div>
+
+<div class="card">
+  <h2>判定サマリ</h2>
+  <div id="verdict"><div class="vn">読み込み中…</div></div>
+</div>
+
+<div class="card">
+  <h2>1. 実行環境</h2>
+  <div id="env"></div>
+</div>
+
+<div class="card">
+  <h2>2. 受け取ったパラメータ</h2>
+  <div id="params"></div>
+</div>
+
+<div class="card">
+  <h2>3. プロフィール</h2>
+  <div id="profile"></div>
+  <div id="loginArea"></div>
+</div>
+
+<div class="card">
+  <h2>getContext()（起動元の情報）</h2>
+  <pre id="ctx">-</pre>
+</div>
+
+<button class="sub" id="copyBtn">結果をテキストでコピー</button>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+// ============ ここを書き換える ============
+const LIFF_ID = "PASTE_YOUR_LIFF_ID";
+// ========================================
+
+const q  = new URLSearchParams(location.search);
+const id = q.get("liffId") || LIFF_ID;
+
+const $ = (s) => document.querySelector(s);
+const results = {};
+
+function row(k, v, mono) {
+  const empty = (v === undefined || v === null || v === "");
+  const cls = "v" + (mono ? " mono" : "") + (empty ? " empty" : "");
+  return `<div class="row"><div class="k">${k}</div><div class="${cls}">${empty ? "（なし）" : String(v)}</div></div>`;
+}
+
+function banner(type, msg) {
+  $("#banner").innerHTML = `<div class="banner ${type}">${msg}</div>`;
+}
+
+function verdict(items) {
+  $("#verdict").innerHTML = items.map(i => {
+    const mark = i.state === "ok" ? "○" : i.state === "ng" ? "×" : "△";
+    return `<div class="verdict">
+      <div class="mark ${i.state}">${mark}</div>
+      <div><div class="vt">${i.title}</div><div class="vn">${i.note}</div></div>
+    </div>`;
+  }).join("");
+}
+
+// ---- 2. クエリパラメータ（LIFF初期化前に取得しておく） ----
+const rawSearch = location.search;
+const entries = [...q.entries()].filter(([k]) => k !== "liffId");
+let paramHtml = row("生のクエリ文字列", rawSearch, true);
+if (entries.length === 0) {
+  paramHtml += row("個別パラメータ", "");
+} else {
+  entries.forEach(([k, v]) => { paramHtml += row("　" + k, v, true); });
+}
+// LIFFブラウザではパラメータが liff.state に入る場合がある
+const liffState = q.get("liff.state");
+if (liffState) paramHtml += row("liff.state", decodeURIComponent(liffState), true);
+$("#params").innerHTML = paramHtml;
+
+results.query = rawSearch;
+results.paramCount = entries.length;
+
+// ---- 初期化 ----
+(async () => {
+  if (!id || id === "PASTE_YOUR_LIFF_ID") {
+    banner("err", "LIFF ID が未設定です。ファイル内の LIFF_ID を書き換えるか、URL に ?liffId=… を付けてください。");
+    $("#env").innerHTML = row("LIFF ID", "");
+    $("#profile").innerHTML = row("状態", "LIFF ID 未設定のため取得できません");
+    verdict([
+      { state: "ng", title: "① userId が取れるか", note: "LIFF ID 未設定" },
+      { state: "ng", title: "② 外部ブラウザでの挙動", note: "LIFF ID 未設定" },
+      { state: entries.length > 0 ? "ok" : "ng", title: "③ クエリパラメータが渡るか",
+        note: entries.length > 0 ? `${entries.length} 個受信` : "パラメータなし" }
+    ]);
+    return;
+  }
+
+  try {
+    await liff.init({ liffId: id });
+  } catch (e) {
+    banner("err", "liff.init() に失敗しました：" + (e && e.message ? e.message : e));
+    $("#env").innerHTML = row("LIFF ID", id, true) + row("エラー", String(e));
+    return;
+  }
+
+  // ---- 1. 実行環境 ----
+  const inClient  = liff.isInClient();
+  const loggedIn  = liff.isLoggedIn();
+  const os        = liff.getOS();
+  const lineVer   = liff.getLineVersion();
+  const liffVer   = liff.getVersion();
+  const lang      = liff.getLanguage ? liff.getLanguage() : "-";
+
+  const where = inClient ? "LIFFブラウザ（LINEアプリ内）" : "外部ブラウザ";
+
+  $("#env").innerHTML =
+    row("LIFF ID", id, true) +
+    row("開かれている場所", where) +
+    row("isInClient()", String(inClient)) +
+    row("isLoggedIn()", String(loggedIn)) +
+    row("OS", os) +
+    row("LINE バージョン", lineVer) +
+    row("LIFF SDK", liffVer) +
+    row("言語", lang);
+
+  results.inClient = inClient;
+  results.loggedIn = loggedIn;
+  results.where = where;
+
+  // ---- getContext ----
+  try {
+    $("#ctx").textContent = JSON.stringify(liff.getContext(), null, 2);
+  } catch (e) {
+    $("#ctx").textContent = "取得できません：" + e;
+  }
+
+  // ---- 3. プロフィール ----
+  let userId = null;
+  if (!loggedIn) {
+    $("#profile").innerHTML = row("状態", "未ログインのため取得できません");
+    $("#loginArea").innerHTML = '<button id="loginBtn">LINEログインして取得する</button>';
+    $("#loginBtn").onclick = () => liff.login({ redirectUri: location.href });
+    banner("info", "外部ブラウザでは liff.init() だけではログインされません。上のボタンで liff.login() を実行してください。");
+  } else {
+    try {
+      const p = await liff.getProfile();
+      userId = p.userId;
+      let idTokenInfo = "（取得できず）";
+      try {
+        const t = liff.getIDToken();
+        if (t) idTokenInfo = t.slice(0, 24) + "…（" + t.length + "文字）";
+      } catch (e) { idTokenInfo = "エラー: " + e; }
+
+      $("#profile").innerHTML =
+        row("userId", p.userId, true) +
+        row("表示名", p.displayName) +
+        row("ステータスメッセージ", p.statusMessage) +
+        row("画像URL", p.pictureUrl, true) +
+        row("IDトークン", idTokenInfo, true);
+    } catch (e) {
+      $("#profile").innerHTML = row("エラー", String(e));
+      banner("err", "getProfile() に失敗：" + e + "（LIFFの権限で profile が有効か確認してください）");
+    }
+  }
+  results.userId = userId;
+
+  // ---- 判定サマリ ----
+  verdict([
+    {
+      state: userId ? "ok" : "ng",
+      title: "① userId が取れるか",
+      note: userId ? "取得成功。会社の紐付けに使えます" : "取得できず。ログインまたは権限設定を確認"
+    },
+    {
+      state: inClient ? "ok" : "warn",
+      title: "② どのブラウザで開かれているか",
+      note: where + (inClient ? "。LIFF機能はフルで使えます" : "。一部のLIFF機能が制限されます")
+    },
+    {
+      state: entries.length > 0 ? "ok" : "ng",
+      title: "③ クエリパラメータが渡るか",
+      note: entries.length > 0
+        ? entries.map(([k, v]) => k + "=" + v).join(" / ") + " を受信"
+        : "パラメータなし。?company=C001 などを付けて再度開いてください"
+    }
+  ]);
+})();
+
+// ---- コピー ----
+$("#copyBtn").onclick = () => {
+  const text = [
+    "=== LIFF 動作確認結果 ===",
+    "日時: " + new Date().toLocaleString("ja-JP"),
+    "URL : " + location.href,
+    "",
+    "開かれている場所: " + (results.where || "-"),
+    "isInClient      : " + results.inClient,
+    "isLoggedIn      : " + results.loggedIn,
+    "userId          : " + (results.userId || "取得できず"),
+    "クエリ           : " + (results.query || "なし"),
+    "パラメータ数     : " + results.paramCount,
+    "",
+    "getContext():",
+    $("#ctx").textContent
+  ].join("\n");
+
+  navigator.clipboard.writeText(text)
+    .then(() => { $("#copyBtn").textContent = "コピーしました"; })
+    .catch(() => { $("#copyBtn").textContent = "コピーに失敗しました"; });
+};
+</script>
+</body>
+</html>
