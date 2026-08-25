@@ -66,9 +66,12 @@
 
 <h1>LIFF 動作確認</h1>
 <p class="lead">
-  LIFF ID は下のいずれかで指定します。<br>
-  ① このファイルの <code>LIFF_ID</code> を書き換える<br>
-  ② URL に <code>?liffId=xxxxxxx-xxxxxxxx</code> を付ける
+  <b>LINE内で開く：</b> LIFF URL（<code>https://liff.line.me/…</code>）を使う<br>
+  <b>外部ブラウザで開く：</b> このページのURLに <code>?openExternalBrowser=1</code> を付ける<br>
+  ※ LIFF URL に <code>openExternalBrowser=1</code> を付けても効きません<br>
+  <br>
+  任意パラメータ：<code>?liffId=…</code>（LIFF ID の上書き）／
+  <code>?autologin=1</code>（外部ブラウザで自動ログイン）
 </p>
 
 <div id="banner"></div>
@@ -95,6 +98,17 @@
 </div>
 
 <div class="card">
+  <h2>外部ブラウザで開くテスト</h2>
+  <p style="font-size:13px;color:var(--sub);margin:0 0 10px;">
+    URL に <code>openExternalBrowser=1</code> を付けても、LIFFのエンドポイントURLは
+    LINEが横取りするため外部ブラウザに出ません。<br>
+    確実に出すには <code>liff.openWindow({ external: true })</code> を使います。
+  </p>
+  <button id="extBtn">この画面を外部ブラウザで開く</button>
+  <button id="extBtn2" style="background:#52627a;">Google を外部ブラウザで開く</button>
+</div>
+
+<div class="card">
   <h2>getContext()（起動元の情報）</h2>
   <pre id="ctx">-</pre>
 </div>
@@ -103,9 +117,10 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-// ============ ここを書き換える ============
-const LIFF_ID = "PASTE_YOUR_LIFF_ID";
-// ========================================
+// ============ LIFF ID ============
+// LINE Developers Console >「LIFF」タブ に表示されている値
+const LIFF_ID = "2011169477-JliRjzo1";
+// =================================
 
 const q  = new URLSearchParams(location.search);
 const id = q.get("liffId") || LIFF_ID;
@@ -165,8 +180,11 @@ results.paramCount = entries.length;
     return;
   }
 
+  // ?autologin=1 を付けると、外部ブラウザでも自動で liff.login() が走る
+  const autoLogin = q.get("autologin") === "1";
+
   try {
-    await liff.init({ liffId: id });
+    await liff.init({ liffId: id, withLoginOnExternalBrowser: autoLogin });
   } catch (e) {
     banner("err", "liff.init() に失敗しました：" + (e && e.message ? e.message : e));
     $("#env").innerHTML = row("LIFF ID", id, true) + row("エラー", String(e));
@@ -191,7 +209,8 @@ results.paramCount = entries.length;
     row("OS", os) +
     row("LINE バージョン", lineVer) +
     row("LIFF SDK", liffVer) +
-    row("言語", lang);
+    row("言語", lang) +
+    row("外部ブラウザ自動ログイン", autoLogin ? "有効（?autologin=1）" : "無効");
 
   results.inClient = inClient;
   results.loggedIn = loggedIn;
@@ -203,6 +222,14 @@ results.paramCount = entries.length;
   } catch (e) {
     $("#ctx").textContent = "取得できません：" + e;
   }
+
+  // ---- 外部ブラウザで開くテスト ----
+  $("#extBtn").onclick = () => {
+    liff.openWindow({ url: location.href, external: true });
+  };
+  $("#extBtn2").onclick = () => {
+    liff.openWindow({ url: "https://www.google.com/", external: true });
+  };
 
   // ---- 3. プロフィール ----
   let userId = null;
