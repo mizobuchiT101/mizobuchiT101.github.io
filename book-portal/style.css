@@ -197,13 +197,28 @@ h3 { margin: 4px 0; font-weight: 700; }
 }
 .home-shelf-illust {
   display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  padding: 18px 16px 12px;
-  min-height: 90px;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px 10px;
+  min-height: 106px;
   overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(231,220,194,0.2));
 }
-.home-mini-spine { border-radius: 2px 2px 0 0; flex-shrink: 0; }
+.home-feature-svg {
+  width: 78px;
+  height: 78px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.18s ease;
+}
+.home-feature-svg .feature-fill {
+  fill: currentColor;
+  fill-opacity: 0.15;
+}
+.home-cell:hover .home-feature-svg { transform: translateY(-2px) scale(1.04); }
 .home-cell-label {
   display: flex;
   align-items: center;
@@ -449,7 +464,8 @@ input:focus, select:focus, textarea:focus {
 
   .home-frame { border-width: 4px; border-radius: 16px; padding: 14px 14px 6px; }
   .home-grid { grid-template-columns: repeat(2, 1fr); }
-  .home-shelf-illust { padding: 12px 10px 8px; min-height: 70px; gap: 3px; }
+  .home-shelf-illust { padding: 10px 10px 7px; min-height: 82px; }
+  .home-feature-svg { width: 62px; height: 62px; }
   .home-cell-label { padding: 10px 10px 12px; gap: 8px; }
   .home-cell-label .icon { width: 18px; height: 18px; }
   .home-cell-label .text b { font-size: 0.82rem; }

@@ -276,26 +276,50 @@ const HOME_ICONS = {
 function homeIcon(name) {
   return `<svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${HOME_ICONS[name]}</svg>`;
 }
-function plantIcon() {
-  return `<svg width="26" height="34" viewBox="0 0 26 34" aria-hidden="true">
-    <path d="M8,22 L18,22 L16,32 L10,32 Z" fill="var(--plant-pot)"/>
-    <ellipse cx="13" cy="16" rx="3.2" ry="8" fill="var(--plant-green)" transform="rotate(-18 13 16)"/>
-    <ellipse cx="13" cy="15" rx="3.2" ry="8.5" fill="var(--plant-green)"/>
-    <ellipse cx="13" cy="16" rx="3.2" ry="8" fill="var(--plant-green)" transform="rotate(18 13 16)"/>
+
+// ホーム上段の機能イラスト。外部画像やアイコンライブラリに依存しない軽量なSVG。
+const HOME_ILLUSTRATIONS = {
+  search: `
+    <path class="feature-fill" d="M10 14h24a6 6 0 0 1 6 6v28H16a6 6 0 0 0-6 6z"/>
+    <path d="M10 14h24a6 6 0 0 1 6 6v28H16a6 6 0 0 0-6 6V20a6 6 0 0 0-6-6z"/>
+    <circle cx="43" cy="31" r="9"/><path d="m50 38 8 8"/>`,
+  plus: `
+    <path class="feature-fill" d="M11 15h27a6 6 0 0 1 6 6v31H17a6 6 0 0 0-6 6z"/>
+    <path d="M11 15h27a6 6 0 0 1 6 6v31H17a6 6 0 0 0-6 6V21a6 6 0 0 0-6-6z"/>
+    <circle cx="48" cy="18" r="11"/><path d="M48 12v12M42 18h12"/>`,
+  book: `
+    <path class="feature-fill" d="M8 17h20a7 7 0 0 1 7 7v27H15a7 7 0 0 0-7 7z"/>
+    <path d="M8 17h20a7 7 0 0 1 7 7v27H15a7 7 0 0 0-7 7V24a7 7 0 0 0-7-7z"/>
+    <path d="M38 25h18M50 19l6 6-6 6"/>`,
+  undo: `
+    <path class="feature-fill" d="M20 15h29a6 6 0 0 1 6 6v31H26a6 6 0 0 0-6 6z"/>
+    <path d="M20 15h29a6 6 0 0 1 6 6v31H26a6 6 0 0 0-6 6z"/>
+    <path d="M21 35H7m6-7-7 7 7 7"/>`,
+  relay: `
+    <path class="feature-fill" d="M21 19h22v29H21z"/><path d="M21 19h22v29H21zM26 25h12M26 31h9"/>
+    <path d="M8 15h13l-5-5M56 52H43l5 5M21 10v10M43 44v13"/>`,
+  heart: `
+    <path class="feature-fill" d="M10 13h24a6 6 0 0 1 6 6v31H16a6 6 0 0 0-6 6z"/>
+    <path d="M10 13h24a6 6 0 0 1 6 6v31H16a6 6 0 0 0-6 6V19a6 6 0 0 0-6-6z"/>
+    <path d="M49 18c-5-7-15 0-8 8l8 8 8-8c7-8-3-15-8-8z"/>`,
+  chat: `
+    <path class="feature-fill" d="M8 12h31a6 6 0 0 1 6 6v30H14a6 6 0 0 0-6 6z"/>
+    <path d="M8 12h31a6 6 0 0 1 6 6v30H14a6 6 0 0 0-6 6z"/>
+    <path d="m50 22 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>`,
+  user: `
+    <circle class="feature-fill" cx="32" cy="19" r="10"/><circle cx="32" cy="19" r="10"/>
+    <path class="feature-fill" d="M12 55c1-13 9-20 20-20s19 7 20 20z"/><path d="M12 55c1-13 9-20 20-20s19 7 20 20"/>
+    <path d="M47 13h10v29H47M51 20h2M51 26h2M51 32h2"/>`,
+  bell: `
+    <path class="feature-fill" d="M17 43h30l-4-6V26a11 11 0 0 0-22 0v11z"/>
+    <path d="M17 43h30l-4-6V26a11 11 0 0 0-22 0v11zM27 48a5 5 0 0 0 10 0"/>
+    <path d="M48 12h9v19M52 17h2M52 22h2M52 27h2"/>`,
+};
+
+function homeIllustration(name, index, title) {
+  return `<svg class="home-feature-svg" viewBox="0 0 64 64" role="img" aria-label="${title}のアイコン" style="color:${SHELF_TONES[index % SHELF_TONES.length]}">
+    ${HOME_ILLUSTRATIONS[name]}
   </svg>`;
-}
-function homeSpines(seed, withPlant) {
-  const pattern = [
-    [34, 60], [22, 78], [40, 68], [16, 50], [26, 72], [18, 46],
-  ];
-  let html = "";
-  for (let i = 0; i < pattern.length; i++) {
-    if (withPlant && i === 2) html += plantIcon();
-    const [w, h] = pattern[(i + seed) % pattern.length];
-    const color = SHELF_TONES[(i + seed) % SHELF_TONES.length];
-    html += `<div class="home-mini-spine" style="width:${w * 0.55}px;height:${h}px;background:${color};"></div>`;
-  }
-  return html;
 }
 
 const HOME_TILES = [
@@ -326,7 +350,7 @@ function renderHome() {
   const grid = wrap.querySelector("#homeGrid");
   HOME_TILES.forEach((t, i) => {
     const cell = el(`<button class="home-cell" type="button">
-      <div class="home-shelf-illust">${homeSpines(i, i % 3 === 0)}</div>
+      <div class="home-shelf-illust">${homeIllustration(t.icon, i, t.title)}</div>
       <div class="home-cell-label">
         ${homeIcon(t.icon)}
         <div class="text"><b>${t.title}</b><span>${t.sub}</span></div>
