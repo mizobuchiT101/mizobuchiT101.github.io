@@ -1,6 +1,6 @@
 // 社内書籍ポータル - フロントエンドのみMock実装(localStorageをMockリポジトリとして使用)
 // データモデルは docs/data-model.md を参照。Book / Holding を分離している。
-const STORAGE_KEY = "bookPortalState_v1";
+const STORAGE_KEY = "bookPortalState_v2"; // v1からv2: 初期データを28冊に拡充したため、古いlocalStorageを再シードさせる
 const USERS = ["山田", "田中", "佐藤", "鈴木", "高橋"]; // テストモード(LINE未連携時)用の仮ユーザー
 const LIFF_ID = "2011169477-JliRjzo1";
 let lineProfile = null; // LINEログイン中はここにプロフィールが入る
