@@ -1,7 +1,14 @@
 // 社内書籍ポータル - フロントエンドのみMock実装(localStorageをMockリポジトリとして使用)
 // データモデルは docs/data-model.md を参照。Book / Holding を分離している。
 const STORAGE_KEY = "bookPortalState_v1";
-const USERS = ["山田", "田中", "佐藤", "鈴木", "高橋"];
+const USERS = ["山田", "田中", "佐藤", "鈴木", "高橋"]; // テストモード(LINE未連携時)用の仮ユーザー
+const LIFF_ID = "2011169477-JliRjzo1";
+let lineProfile = null; // LINEログイン中はここにプロフィールが入る
+
+function getKnownUsers() {
+  if (!state.knownUsers || !state.knownUsers.length) state.knownUsers = USERS.slice();
+  return state.knownUsers;
+}
 
 const CATEGORY_OPTIONS = [
   { value: "一般・入門・ビジネス", curry: "CHICKEN" },
@@ -190,6 +197,7 @@ function seedState() {
     books, holdings, loans,
     borrowRequests: [], relayRequests: [], reviews: [], purchaseRequests: [],
     bookmarks: {},
+    knownUsers: USERS.slice(),
     currentUser: USERS[0],
   };
 }
@@ -227,9 +235,40 @@ document.getElementById("presentationLink").addEventListener("click", (e) => {
 });
 
 const userSelect = document.getElementById("currentUser");
-USERS.forEach((u) => { const o = document.createElement("option"); o.value = u; o.textContent = u; userSelect.appendChild(o); });
-userSelect.value = state.currentUser;
 userSelect.addEventListener("change", () => { state.currentUser = userSelect.value; saveState(state); render(); });
+
+function renderUserSwitch() {
+  if (lineProfile) {
+    document.getElementById("userSwitch").hidden = true;
+    document.getElementById("lineUser").hidden = false;
+    document.getElementById("lineUserPic").src = lineProfile.pictureUrl || "";
+    document.getElementById("lineUserName").textContent = lineProfile.displayName;
+    return;
+  }
+  document.getElementById("userSwitch").hidden = false;
+  document.getElementById("lineUser").hidden = true;
+  userSelect.innerHTML = "";
+  getKnownUsers().forEach((u) => { const o = document.createElement("option"); o.value = u; o.textContent = u; userSelect.appendChild(o); });
+  userSelect.value = state.currentUser;
+}
+
+// LINE(LIFF)経由で開かれた場合、LINEプロフィールを取得してログインユーザーとして扱う。
+// LINE外のブラウザ(通常のPCブラウザ等)で開いた場合は、従来どおり手動のユーザー切り替えを使う(テストモード)。
+async function initLineLogin() {
+  if (typeof liff === "undefined") return; // SDK未読み込み(オフライン等)
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (liff.isLoggedIn()) {
+      const profile = await liff.getProfile();
+      lineProfile = profile;
+      if (!getKnownUsers().includes(profile.displayName)) getKnownUsers().push(profile.displayName);
+      state.currentUser = profile.displayName;
+      saveState(state);
+    }
+  } catch (e) {
+    console.warn("LIFF初期化に失敗しました(LINE外ブラウザ等のため通常モードで起動):", e);
+  }
+}
 
 function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
 
@@ -388,35 +427,85 @@ function naturalTone(title) {
   return SHELF_TONES[hashStr(title) % SHELF_TONES.length];
 }
 
-function buildGridView(items) {
-  const grid = el(`<div class="shelf-grid"></div>`);
-  items.forEach(({ book, holding, ai }) => {
-    const curry = analyzeBook(book, {}, state.books).curry;
-    const btn = el(`<button class="book" style="background:${naturalTone(book.title)};">
-      <div><b>${book.title}</b></div>
-      <div>${ai ? '<span class="tag ai">✨ 類似候補</span>' : holdingBadges(holding)}<span class="tag curry">${CURRY_LABEL[curry.curryType]}</span></div>
-    </button>`);
-    btn.addEventListener("click", () => setView("detail", { bookId: book.id, holdingId: holding ? holding.id : null }));
-    grid.appendChild(btn);
+function groupShelfItems(items) {
+  const groups = new Map();
+  items.forEach((item) => {
+    const category = item.book.category || "未分類";
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(item);
   });
-  return grid;
+  const categoryOrder = new Map(CATEGORY_OPTIONS.map((category, index) => [category.value, index]));
+  return new Map([...groups.entries()].sort(([left], [right]) => {
+    const leftOrder = categoryOrder.get(left) ?? CATEGORY_OPTIONS.length;
+    const rightOrder = categoryOrder.get(right) ?? CATEGORY_OPTIONS.length;
+    return leftOrder - rightOrder || left.localeCompare(right, "ja");
+  }));
+}
+
+function createShelfIndexPlate(category, count) {
+  const plate = el(`<div class="shelf-index-plate"><span class="shelf-index-label"></span><span class="shelf-index-count"></span></div>`);
+  plate.querySelector(".shelf-index-label").textContent = category;
+  plate.querySelector(".shelf-index-count").textContent = `${count}冊`;
+  return plate;
+}
+
+function buildGridView(items) {
+  const wrapper = el(`<div class="shelf-category-list"></div>`);
+  groupShelfItems(items).forEach((categoryItems, category) => {
+    const section = el(`<section class="shelf-category-section"><div class="shelf-grid"></div></section>`);
+    section.prepend(createShelfIndexPlate(category, categoryItems.length));
+    const grid = section.querySelector(".shelf-grid");
+    categoryItems.forEach(({ book, holding, ai }) => {
+      const curry = analyzeBook(book, {}, state.books).curry;
+      const btn = el(`<button class="book" style="background:${naturalTone(book.title)};">
+        <div><b>${book.title}</b></div>
+        <div>${ai ? '<span class="tag ai">✨ 類似候補</span>' : holdingBadges(holding)}<span class="tag curry">${CURRY_LABEL[curry.curryType]}</span></div>
+      </button>`);
+      btn.addEventListener("click", () => setView("detail", { bookId: book.id, holdingId: holding ? holding.id : null }));
+      grid.appendChild(btn);
+    });
+    wrapper.appendChild(section);
+  });
+  return wrapper;
 }
 
 function buildSpineView(items) {
-  const outer = el(`<div class="spine-shelf-outer"><div class="spine-shelf"></div></div>`);
-  const shelf = outer.querySelector(".spine-shelf");
-  items.forEach(({ book, holding }) => {
-    const { heightPx, widthPx } = spineDimensions(book);
-    const label = book.title.length > 16 ? book.title.slice(0, 16) + "…" : book.title;
-    const btn = el(`<button class="spine" title="${book.title}(高さ${book.physicalHeight || "?"}cm/厚さ${book.physicalLength || "?"}cm)"
-      style="height:${heightPx}px;width:${widthPx}px;background:${naturalTone(book.title)};">${label}</button>`);
-    btn.addEventListener("click", () => setView("detail", { bookId: book.id, holdingId: holding ? holding.id : null }));
-    shelf.appendChild(btn);
-  });
   const wrapper = document.createElement("div");
-  wrapper.appendChild(outer);
+  groupShelfItems(items).forEach((categoryItems, category) => {
+    const section = el(`<section class="shelf-category-section spine-category-section"><div class="spine-shelf-outer"><div class="spine-shelf"></div></div></section>`);
+    section.prepend(createShelfIndexPlate(category, categoryItems.length));
+    const shelf = section.querySelector(".spine-shelf");
+    categoryItems.forEach(({ book, holding }) => {
+      const { heightPx, widthPx } = spineDimensions(book);
+      const label = book.title.length > 16 ? book.title.slice(0, 16) + "…" : book.title;
+      const btn = el(`<button class="spine" title="${book.title}(高さ${book.physicalHeight || "?"}cm/厚さ${book.physicalLength || "?"}cm)"
+        style="height:${heightPx}px;width:${widthPx}px;background:${naturalTone(book.title)};">${label}</button>`);
+      btn.addEventListener("click", () => setView("detail", { bookId: book.id, holdingId: holding ? holding.id : null }));
+      shelf.appendChild(btn);
+    });
+    wrapper.appendChild(section);
+  });
   wrapper.appendChild(el(`<p class="spine-caption">📏 本の実際の高さ・厚さに応じてサイズを変えて表示しています(サイズ未登録の本は標準サイズ)</p>`));
   return wrapper;
+}
+
+function sortShelfHoldings(holdings, sortBy) {
+  return holdings.slice().sort((left, right) => {
+    const a = bookById(left.bookId);
+    const b = bookById(right.bookId);
+    if (!a || !b) return 0;
+    if (sortBy === "TITLE_DESC") return b.title.localeCompare(a.title, "ja");
+    if (sortBy === "READING_LOW" || sortBy === "READING_HIGH") {
+      const aScore = analyzeBook(a, {}, state.books).readingLoadScore;
+      const bScore = analyzeBook(b, {}, state.books).readingLoadScore;
+      return sortBy === "READING_LOW" ? aScore - bScore : bScore - aScore;
+    }
+    if (sortBy === "STATUS") {
+      const statusOrder = { AVAILABLE: 0, ON_LOAN: 1, UNAVAILABLE: 2 };
+      return (statusOrder[left.status] ?? 9) - (statusOrder[right.status] ?? 9) || a.title.localeCompare(b.title, "ja");
+    }
+    return a.title.localeCompare(b.title, "ja");
+  });
 }
 
 function renderShelf() {
@@ -426,7 +515,17 @@ function renderShelf() {
       <button data-mode="grid">標準表示</button>
       <button data-mode="size">実寸表示</button>
     </div>
-    <div class="card"><input id="searchBox" placeholder="🔍 タイトル・ISBNで検索(該当なしの場合はAI類似候補を表示)"></div>
+    <div class="card shelf-controls">
+      <label for="searchBox">書籍検索</label>
+      <input id="searchBox" placeholder="🔍 タイトル・ISBNで検索(該当なしの場合はAI類似候補を表示)">
+      <div class="shelf-filter-grid">
+        <div><label for="holdingTypeFilter">所有区分</label><select id="holdingTypeFilter"><option value="ALL">すべて</option><option value="COMPANY">会社所有</option><option value="PERSONAL">私物</option></select></div>
+        <div><label for="statusFilter">貸出状態</label><select id="statusFilter"><option value="ALL">すべて</option><option value="AVAILABLE">在庫</option><option value="ON_LOAN">貸出中</option><option value="UNAVAILABLE">利用不可</option></select></div>
+        <div><label for="categoryFilter">カテゴリ</label><select id="categoryFilter"><option value="ALL">すべて</option>${CATEGORY_OPTIONS.map((c) => `<option value="${c.value}">${c.value}</option>`).join("")}</select></div>
+        <div><label for="sortBy">カテゴリ内の並び順</label><select id="sortBy"><option value="TITLE_ASC">書名 昇順</option><option value="TITLE_DESC">書名 降順</option><option value="READING_LOW">Reading Loadが低い順</option><option value="READING_HIGH">Reading Loadが高い順</option><option value="STATUS">貸出可能な順</option></select></div>
+      </div>
+      <div class="shelf-filter-footer"><span id="resultCount" class="note"></span><button class="btn secondary small" id="resetShelfFilters" type="button">条件をクリア</button></div>
+    </div>
     <div class="card"><div id="resultArea"></div></div>
     <button class="btn" id="newBookBtn">＋ 新しい本を登録</button>
   </div>`);
@@ -444,7 +543,16 @@ function renderShelf() {
   syncToggle();
 
   function visibleHoldings() {
-    return state.holdings.filter((h) => isHoldingVisibleTo(h, state.currentUser));
+    const holdingType = wrap.querySelector("#holdingTypeFilter").value;
+    const status = wrap.querySelector("#statusFilter").value;
+    const category = wrap.querySelector("#categoryFilter").value;
+    return state.holdings.filter((h) => {
+      const book = bookById(h.bookId);
+      return isHoldingVisibleTo(h, state.currentUser)
+        && (holdingType === "ALL" || h.holdingType === holdingType)
+        && (status === "ALL" || h.status === status)
+        && (category === "ALL" || (book && book.category === category));
+    });
   }
 
   function renderItems(items) {
@@ -454,7 +562,7 @@ function renderShelf() {
   function draw(filter) {
     resultArea.innerHTML = "";
     const f = (filter || "").trim().toLowerCase();
-    const holdings = visibleHoldings();
+    const holdings = sortShelfHoldings(visibleHoldings(), wrap.querySelector("#sortBy").value);
     let matched = holdings.filter((h) => {
       const b = bookById(h.bookId);
       if (!b) return false;
@@ -463,6 +571,7 @@ function renderShelf() {
 
     if (matched.length > 0 || !f) {
       const items = matched.map((h) => ({ book: bookById(h.bookId), holding: h }));
+      wrap.querySelector("#resultCount").textContent = `${items.length}冊を表示`;
       resultArea.appendChild(renderItems(items));
       if (matched.length === 0) resultArea.appendChild(el(`<p class="note">該当する本がありません</p>`));
       return;
@@ -470,6 +579,7 @@ function renderShelf() {
 
     // 通常検索0件 → AI類似候補
     const similar = findSimilarBooksMock(f, state.books.filter((b) => holdings.some((h) => h.bookId === b.id)));
+    wrap.querySelector("#resultCount").textContent = "通常検索 0冊";
     resultArea.appendChild(el(`<p class="note">通常検索: 0件</p>`));
     if (similar.length === 0) {
       resultArea.appendChild(el(`<p class="note">類似する登録書籍は見つかりませんでした。</p>`));
@@ -481,11 +591,34 @@ function renderShelf() {
   }
   draw("");
   wrap.querySelector("#searchBox").addEventListener("input", (e) => draw(e.target.value));
+  wrap.querySelectorAll("#holdingTypeFilter, #statusFilter, #categoryFilter, #sortBy").forEach((control) => control.addEventListener("change", () => draw(wrap.querySelector("#searchBox").value)));
+  wrap.querySelector("#resetShelfFilters").addEventListener("click", () => {
+    wrap.querySelector("#searchBox").value = "";
+    wrap.querySelector("#holdingTypeFilter").value = "ALL";
+    wrap.querySelector("#statusFilter").value = "ALL";
+    wrap.querySelector("#categoryFilter").value = "ALL";
+    wrap.querySelector("#sortBy").value = "TITLE_ASC";
+    draw("");
+  });
   wrap.querySelector("#newBookBtn").addEventListener("click", () => setView("register"));
   return wrap;
 }
 
 // ---------- 書籍詳細 ----------
+function bookCoverPlaceholder(book) {
+  return `<div class="book-cover-placeholder" style="--cover-tone:${naturalTone(book.title)}" role="img" aria-label="表紙画像未設定の本">
+    <svg class="book-cover-placeholder-icon" viewBox="0 0 120 150" aria-hidden="true">
+      <path class="cover-shadow" d="M26 15h69a10 10 0 0 1 10 10v108H36a10 10 0 0 0-10 10z"/>
+      <path class="cover-body" d="M20 10h69a10 10 0 0 1 10 10v108H30a10 10 0 0 0-10 10z"/>
+      <path class="cover-line" d="M20 10h69a10 10 0 0 1 10 10v108H30a10 10 0 0 0-10 10V20a10 10 0 0 0-10-10zM32 10v118"/>
+      <path class="cover-page" d="M32 128h67M32 134h62M32 140h58"/>
+      <path class="cover-emblem" d="M47 55c9-4 17-2 22 3v31c-5-5-13-7-22-3zm44 0c-9-4-17-2-22 3v31c5-5 13-7 22-3z"/>
+      <path class="cover-bookmark" d="M82 10v25l6-5 6 5V11"/>
+    </svg>
+    <span>表紙画像<small>未設定</small></span>
+  </div>`;
+}
+
 function renderDetail() {
   const { bookId, holdingId } = currentParam || {};
   const book = bookById(bookId);
@@ -506,8 +639,8 @@ function renderDetail() {
     <div class="back-link" id="backBtn">← 本棚に戻る</div>
     <h2>${book.title}</h2>
 
-    <div class="card row">
-      <div><div class="note" style="padding:40px 0;text-align:center;border:1px dashed var(--line);border-radius:6px;">表紙画像(未設定)</div></div>
+    <div class="card row book-summary">
+      <div class="book-cover-column">${bookCoverPlaceholder(book)}</div>
       <div>
         <span class="tag">ISBN: ${book.isbn}</span>
         <span class="tag">${book.category || "-"}</span>
@@ -801,7 +934,7 @@ function renderRegister() {
       <b>所蔵(Holding)情報</b>
       <div class="row">
         <div><label>所有区分</label><select id="hType"><option value="COMPANY">会社所有</option><option value="PERSONAL">私物</option></select></div>
-        <div id="ownerField" style="display:none"><label>所有者(私物の場合)</label><select id="hOwner">${USERS.map((u) => `<option ${u === state.currentUser ? "selected" : ""}>${u}</option>`).join("")}</select></div>
+        <div id="ownerField" style="display:none"><label>所有者(私物の場合)</label><select id="hOwner">${getKnownUsers().map((u) => `<option ${u === state.currentUser ? "selected" : ""}>${u}</option>`).join("")}</select></div>
       </div>
       <div id="visibilityField" style="display:none">
         <label>公開範囲(私物の場合)</label>
@@ -1023,7 +1156,7 @@ function renderRelay() {
       <label>本を選択(現在あなたが所持している本のみ)</label>
       <select id="relayHolding">${myHoldings.map((h) => { const b = bookById(h.bookId); return `<option value="${h.id}">${b ? b.title : "?"}</option>`; }).join("") || '<option value="">所持している本がありません</option>'}</select>
       <label>次に読んでほしい人</label>
-      <select id="relayTo">${USERS.filter((u) => u !== state.currentUser).map((u) => `<option>${u}</option>`).join("")}</select>
+      <select id="relayTo">${getKnownUsers().filter((u) => u !== state.currentUser).map((u) => `<option>${u}</option>`).join("")}</select>
       <label>メッセージ</label>
       <textarea id="relayMessage" rows="2" placeholder="この本オススメです！"></textarea>
       <button class="btn" id="relaySubmit" ${myHoldings.length ? "" : "disabled"}>リレーする</button>
@@ -1227,7 +1360,7 @@ function renderNotify() {
 
 // ---------- 操作マニュアル ----------
 const MANUAL_SECTIONS = [
-  { title: "アプリを起動する", body: "frontend/index.html をブラウザ(Chrome/Edge推奨)で直接開く。サーバー不要。画面右上の「ログインユーザー」で操作する人を切り替えられる(山田/田中/佐藤/鈴木/高橋)。<br><b>注意:</b> データはブラウザのlocalStorageにのみ保存され、他の人・他端末とは共有されない。" },
+  { title: "アプリを起動する", body: "frontend/index.html をブラウザ(Chrome/Edge推奨)で直接開く。サーバー不要。LINEアプリ内(LIFF)で開いた場合は自分のLINEプロフィールがそのままログインユーザーになる。通常ブラウザで開いた場合(動作確認用)は、画面右上の「ログインユーザー」で操作する人を切り替えられる(山田/田中/佐藤/鈴木/高橋)。<br><b>注意:</b> データはブラウザのlocalStorageにのみ保存され、他の人・他端末とは共有されない。" },
   { title: "書籍を探す", body: "「本棚」タブの検索欄にタイトル・ISBNの一部を入力すると絞り込まれる。通常検索で0件の場合、登録済みの本の中からAIが意味的に近い候補を「✨ AIによる類似候補」として提示する。" },
   { title: "書籍を登録する", body: "「登録」タブ、または本棚下部の「＋ 新しい本を登録」から入力画面を開き、書籍名・著者・出版社・あらすじ・カテゴリ・ページ数・内容の特徴(チェックボックス)・所有区分(会社所有/私物)・保管場所を入力して保存する。" },
   { title: "ISBNで登録する", body: "登録画面のISBN欄に入力し「ISBN書誌情報取得(Mock)」を押すと、タイトル等が自動入力される。<b>本セッションでは実際の外部書誌APIへは接続せず、擬似データを生成している。</b>" },
@@ -1324,4 +1457,7 @@ function renderPresentation() {
   </div>`);
 }
 
-render();
+initLineLogin().finally(() => {
+  renderUserSwitch();
+  render();
+});

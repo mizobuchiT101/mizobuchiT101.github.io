@@ -15,9 +15,14 @@
   </svg>社内書籍ポータル</h1>
   <div class="header-actions">
     <a href="#presentation" id="presentationLink" class="presentation-link">技術・工夫点</a>
-    <div class="user-switch">
+    <div class="user-switch" id="userSwitch">
       ログインユーザー:
       <select id="currentUser"></select>
+    </div>
+    <div class="line-user" id="lineUser" hidden>
+      <img id="lineUserPic" alt="">
+      <span id="lineUserName"></span>
+      <span class="tag" style="margin:0;">LINE連携中</span>
     </div>
   </div>
 </header>
@@ -37,6 +42,7 @@
 
 <main id="main"></main>
 
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

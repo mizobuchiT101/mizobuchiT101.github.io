@@ -89,6 +89,21 @@ header h1 {
   font-weight: 600;
   cursor: pointer;
 }
+.line-user {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.line-user img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--line);
+}
 
 nav {
   display: flex;
@@ -254,6 +269,63 @@ h3 { margin: 4px 0; font-weight: 700; }
 .shelf-toggle button:last-child { border-right: none; }
 .shelf-toggle button.active { background: var(--wood-dark); color: #fff; }
 
+.shelf-controls > label:first-child { margin-top: 0; }
+.shelf-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.shelf-filter-grid label { white-space: nowrap; }
+.shelf-filter-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 38px;
+  margin-top: 8px;
+}
+.shelf-category-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 20px;
+  margin-top: 18px;
+}
+.shelf-category-list .shelf-category-section { min-width: 0; }
+.shelf-index-plate {
+  position: relative;
+  width: fit-content;
+  min-width: 180px;
+  max-width: calc(100% - 20px);
+  margin: 0 0 12px 12px;
+  padding: 8px 38px 8px 16px;
+  color: #49351f;
+  background: linear-gradient(180deg, #ead2a8, #d4ae73);
+  border: 1px solid #b78c50;
+  border-radius: 5px 5px 2px 2px;
+  box-shadow: 0 3px 0 #9c7543, 0 5px 10px rgba(99, 70, 34, 0.13);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.shelf-index-plate::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  bottom: -5px;
+  width: 7px;
+  height: 23px;
+  border-radius: 3px 0 0 3px;
+  background: #a77e49;
+}
+.shelf-index-count {
+  position: absolute;
+  right: 10px;
+  color: rgba(73, 53, 31, 0.65);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.spine-category-section + .spine-category-section { margin-top: 28px; }
+
 /* ---- グリッド表示(標準) ---- */
 .shelf-grid {
   display: grid;
@@ -278,6 +350,64 @@ h3 { margin: 4px 0; font-weight: 700; }
 }
 .book:hover { transform: translateY(-3px); }
 .book b { font-size: 0.86rem; line-height: 1.35; display: block; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+
+/* ---- 書籍詳細: 表紙未設定時のSVGプレースホルダー ---- */
+.book-summary { align-items: center; }
+.book-summary .book-cover-column {
+  flex: 0 0 190px;
+  min-width: 190px;
+  display: flex;
+  justify-content: center;
+}
+.book-cover-placeholder {
+  width: 166px;
+  min-height: 226px;
+  padding: 14px 12px 13px;
+  border-radius: 4px 10px 10px 4px;
+  color: var(--cover-tone);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--cover-tone) 14%, var(--surface)), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--cover-tone) 48%, var(--line));
+  border-left: 7px solid var(--cover-tone);
+  box-shadow: 6px 8px 16px rgba(80, 62, 38, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.book-cover-placeholder-icon {
+  width: 112px;
+  height: 140px;
+  overflow: visible;
+}
+.book-cover-placeholder .cover-shadow { fill: rgba(70, 57, 42, 0.12); }
+.book-cover-placeholder .cover-body { fill: currentColor; fill-opacity: 0.15; }
+.book-cover-placeholder .cover-line,
+.book-cover-placeholder .cover-page,
+.book-cover-placeholder .cover-emblem,
+.book-cover-placeholder .cover-bookmark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.book-cover-placeholder .cover-emblem { fill: var(--surface); fill-opacity: 0.72; }
+.book-cover-placeholder span {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.book-cover-placeholder small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
 
 /* ---- 実寸(サイズ比例)表示 ---- */
 .spine-shelf-outer {
@@ -473,10 +603,16 @@ input:focus, select:focus, textarea:focus {
 
   .row { flex-direction: column; }
   .row > div { min-width: 0; width: 100%; }
+  .book-summary .book-cover-column { flex-basis: auto; min-width: 0; }
+
+  .shelf-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; }
+  .shelf-category-list { grid-template-columns: 1fr; gap: 24px; }
+  .shelf-index-plate { min-width: 150px; margin-left: 9px; }
 
   .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
 }
 
 @media (max-width: 420px) {
   .home-grid { grid-template-columns: 1fr; }
+  .shelf-filter-grid { grid-template-columns: 1fr; }
 }
