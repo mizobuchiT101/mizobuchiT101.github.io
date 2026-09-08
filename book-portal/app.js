@@ -182,17 +182,83 @@ function seedState() {
     { id: uid(), isbn: "9784000000002", title: "エンジニアの成長戦略", authors: "山田太郎", publisher: "技術評論社", description: "キャリアを長期的に伸ばすための考え方。", category: "一般・入門・ビジネス", pageCount: 180, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.2, physicalWeight: 250, price: 1800 },
     { id: uid(), isbn: "9784000000003", title: "分散システム設計の教科書", authors: "田中花子", publisher: "翔泳社", description: "大規模システムを支える分散設計の理論と実践。", category: "専門・体系的・リファレンス", pageCount: 480, physicalHeight: 23, physicalWidth: 18, physicalLength: 3, physicalWeight: 620, price: 3200 },
     { id: uid(), isbn: "9784000000004", title: "はじめてのUIデザイン", authors: "佐藤次郎", publisher: "MdN", description: "初心者向けにUIデザインの基礎を解説。", category: "デザイン・創作・視覚表現", pageCount: 150, physicalHeight: 18, physicalWidth: 12, physicalLength: 1, physicalWeight: 200, price: 1600 },
+
+    // ---- 一般・入門・ビジネス ----
+    { id: uid(), isbn: "9784000000005", title: "新人エンジニアのための仕事術", authors: "中村航", publisher: "日経BP", description: "社会人1年目に押さえておきたい基本の考え方とふるまい。", category: "一般・入門・ビジネス", pageCount: 200, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.3, physicalWeight: 260, price: 1500 },
+    { id: uid(), isbn: "9784000000006", title: "リーダーになる前に読む本", authors: "小林恵", publisher: "ダイヤモンド社", description: "はじめてチームを持つ人へ向けたマネジメントの入り口。", category: "一般・入門・ビジネス", pageCount: 220, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.4, physicalWeight: 270, price: 1600 },
+    { id: uid(), isbn: "9784000000007", title: "会議が変わるファシリテーション入門", authors: "松本亮", publisher: "PHP研究所", description: "話し合いを前に進めるための基本テクニック集。", category: "一般・入門・ビジネス", pageCount: 190, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.2, physicalWeight: 240, price: 1500 },
+
+    // ---- 実務・技術・How-to ----
+    { id: uid(), isbn: "9784000000008", title: "現場で使えるGit入門", authors: "木村隼人", publisher: "技術評論社", description: "チーム開発で困らないためのGit運用の実践知識。", category: "実務・技術・How-to", pageCount: 240, physicalHeight: 21, physicalWidth: 15, physicalLength: 1.6, physicalWeight: 340, price: 2200 },
+    { id: uid(), isbn: "9784000000009", title: "実践クラウドインフラ構築ガイド", authors: "高橋step", publisher: "翔泳社", description: "クラウド環境の設計から運用までを一気通貫で解説。", category: "実務・技術・How-to", pageCount: 300, physicalHeight: 22, physicalWidth: 16, physicalLength: 2, physicalWeight: 420, price: 2800 },
+    { id: uid(), isbn: "9784000000010", title: "テスト自動化の教科書", authors: "藤田さくら", publisher: "オライリー", description: "手動テストから自動化へ移行するための実践手順。", category: "実務・技術・How-to", pageCount: 280, physicalHeight: 21, physicalWidth: 15, physicalLength: 1.8, physicalWeight: 380, price: 2600 },
+
+    // ---- 専門・体系的・リファレンス ----
+    { id: uid(), isbn: "9784000000011", title: "データベース内部構造の理論と実装", authors: "岡本圭吾", publisher: "共立出版", description: "インデックスやトランザクションの仕組みを体系的に解説。", category: "専門・体系的・リファレンス", pageCount: 520, physicalHeight: 23, physicalWidth: 18, physicalLength: 3.2, physicalWeight: 680, price: 3800 },
+    { id: uid(), isbn: "9784000000012", title: "コンパイラ構成技法", authors: "西村悠", publisher: "サイエンス社", description: "字句解析から最適化までを網羅する定番リファレンス。", category: "専門・体系的・リファレンス", pageCount: 560, physicalHeight: 23, physicalWidth: 18, physicalLength: 3.4, physicalWeight: 700, price: 4200 },
+    { id: uid(), isbn: "9784000000013", title: "ネットワークプロトコル大全", authors: "橋本直樹", publisher: "オーム社", description: "TCP/IPから最新プロトコルまでを一冊に集約。", category: "専門・体系的・リファレンス", pageCount: 540, physicalHeight: 23, physicalWidth: 18, physicalLength: 3.3, physicalWeight: 690, price: 4000 },
+
+    // ---- デザイン・創作・視覚表現 ----
+    { id: uid(), isbn: "9784000000014", title: "配色とレイアウトの基本ルール", authors: "永井さやか", publisher: "エムディエヌ", description: "実例で学ぶ、見やすく美しい配色・レイアウトの原則。", category: "デザイン・創作・視覚表現", pageCount: 160, physicalHeight: 18, physicalWidth: 12, physicalLength: 1.1, physicalWeight: 210, price: 1700 },
+    { id: uid(), isbn: "9784000000015", title: "写真で伝えるビジュアルストーリーテリング", authors: "石田蓮", publisher: "玄光社", description: "一枚の写真で物語を伝えるための構図と編集の技法。", category: "デザイン・創作・視覚表現", pageCount: 180, physicalHeight: 18, physicalWidth: 12, physicalLength: 1.3, physicalWeight: 230, price: 1900 },
+    { id: uid(), isbn: "9784000000016", title: "プロダクトデザインのスケッチ術", authors: "村上悠斗", publisher: "ビー・エヌ・エヌ", description: "アイデアを素早く形にするためのスケッチの描き方。", category: "デザイン・創作・視覚表現", pageCount: 170, physicalHeight: 18, physicalWidth: 12, physicalLength: 1.2, physicalWeight: 220, price: 1800 },
+
+    // ---- 理論・数学・哲学・抽象 ----
+    { id: uid(), isbn: "9784000000017", title: "圏論のはじめかた", authors: "牧野遼", publisher: "日本評論社", description: "対象と射という考え方から圏論の基礎をやさしく紹介。", category: "理論・数学・哲学・抽象", pageCount: 260, physicalHeight: 21, physicalWidth: 15, physicalLength: 1.7, physicalWeight: 340, price: 2600 },
+    { id: uid(), isbn: "9784000000018", title: "論理学入門", authors: "小川智也", publisher: "岩波書店", description: "命題論理・述語論理を基礎から学ぶ定番の入門書。", category: "理論・数学・哲学・抽象", pageCount: 240, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.6, physicalWeight: 300, price: 2200 },
+    { id: uid(), isbn: "9784000000019", title: "確率と統計の考え方", authors: "青木美穂", publisher: "講談社", description: "身近な例から確率・統計の基本概念を丁寧に解説。", category: "理論・数学・哲学・抽象", pageCount: 230, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.5, physicalWeight: 290, price: 2000 },
+    { id: uid(), isbn: "9784000000020", title: "哲学対話のすすめ", authors: "宮下大輔", publisher: "筑摩書房", description: "答えのない問いをめぐって対話するための入り口。", category: "理論・数学・哲学・抽象", pageCount: 200, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.3, physicalWeight: 260, price: 1800 },
+
+    // ---- Tips集・辞典・用語集・雑学 ----
+    { id: uid(), isbn: "9784000000021", title: "IT用語ポケット辞典", authors: "編集部", publisher: "技術評論社", description: "現場でよく使うIT用語を短い説明でまとめた携帯版辞典。", category: "Tips集・辞典・用語集・雑学", pageCount: 320, physicalHeight: 15, physicalWidth: 10, physicalLength: 2, physicalWeight: 260, price: 1200 },
+    { id: uid(), isbn: "9784000000022", title: "ショートカットキー百科", authors: "編集部", publisher: "インプレス", description: "主要ソフトの作業効率を上げるショートカット集。", category: "Tips集・辞典・用語集・雑学", pageCount: 180, physicalHeight: 15, physicalWidth: 10, physicalLength: 1.2, physicalWeight: 180, price: 1000 },
+    { id: uid(), isbn: "9784000000023", title: "ビジネス略語辞典", authors: "編集部", publisher: "日経BP", description: "会議やメールで飛び交う略語をさっと調べられる一冊。", category: "Tips集・辞典・用語集・雑学", pageCount: 260, physicalHeight: 15, physicalWidth: 10, physicalLength: 1.6, physicalWeight: 220, price: 1100 },
+    { id: uid(), isbn: "9784000000024", title: "雑学で学ぶ世界の歴史", authors: "秋山哲", publisher: "PHP研究所", description: "小ネタから世界史の流れをつかむ雑学読み物。", category: "Tips集・辞典・用語集・雑学", pageCount: 240, physicalHeight: 18, physicalWidth: 12, physicalLength: 1.5, physicalWeight: 280, price: 1400 },
+
+    // ---- 一般教養・複数分野横断 ----
+    { id: uid(), isbn: "9784000000025", title: "教養としてのアート入門", authors: "川口optimize", publisher: "新潮社", description: "美術史の流れを一般教養としてつかむための入門書。", category: "一般教養・複数分野横断", pageCount: 220, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.5, physicalWeight: 280, price: 1800 },
+    { id: uid(), isbn: "9784000000026", title: "文系のためのテクノロジー入門", authors: "菅原光", publisher: "光文社", description: "専門用語を避けながら最新技術の全体像をつかむ一冊。", category: "一般教養・複数分野横断", pageCount: 210, physicalHeight: 18, physicalWidth: 12, physicalLength: 1.4, physicalWeight: 260, price: 1600 },
+    { id: uid(), isbn: "9784000000027", title: "世界史と経済のつながりを学ぶ", authors: "遠藤久美", publisher: "東洋経済新報社", description: "歴史の出来事を経済の視点から読み直す教養書。", category: "一般教養・複数分野横断", pageCount: 260, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.7, physicalWeight: 320, price: 1900 },
+    { id: uid(), isbn: "9784000000028", title: "科学と社会の教科書", authors: "土屋真由", publisher: "岩波書店", description: "科学技術が社会に与える影響を横断的に考える入門書。", category: "一般教養・複数分野横断", pageCount: 230, physicalHeight: 19, physicalWidth: 13, physicalLength: 1.5, physicalWeight: 290, price: 1700 },
   ];
+
+  const OWNER_ROTATION = ["山田", "田中", "佐藤", "鈴木", "高橋"];
   const holdings = [
     { id: uid(), bookId: books[0].id, holdingType: "COMPANY", ownerId: null, ownerDisplayName: "会社", location: "本棚A", visibility: "LOAN_AVAILABLE", loanAllowed: true, currentHolderId: "山田", currentHolderDisplayName: "山田", status: "ON_LOAN", availableFrom: null },
     { id: uid(), bookId: books[1].id, holdingType: "PERSONAL", ownerId: "田中", ownerDisplayName: "田中", location: "田中の席", visibility: "LOAN_AVAILABLE", loanAllowed: true, currentHolderId: "田中", currentHolderDisplayName: "田中", status: "AVAILABLE", availableFrom: null },
     { id: uid(), bookId: books[2].id, holdingType: "COMPANY", ownerId: null, ownerDisplayName: "会社", location: "本棚B", visibility: "LOAN_AVAILABLE", loanAllowed: true, currentHolderId: "佐藤", currentHolderDisplayName: "佐藤", status: "ON_LOAN", availableFrom: null },
     { id: uid(), bookId: books[3].id, holdingType: "PERSONAL", ownerId: "鈴木", ownerDisplayName: "鈴木", location: "鈴木の席", visibility: "INTERNAL_VISIBLE", loanAllowed: false, currentHolderId: "鈴木", currentHolderDisplayName: "鈴木", status: "AVAILABLE", availableFrom: null },
   ];
+  // 5冊目以降(index 4〜)は会社所有／私物を交互にして、各所蔵はデフォルトで在庫(AVAILABLE)にする
+  for (let i = 4; i < books.length; i++) {
+    const isCompany = i % 2 === 0;
+    const owner = OWNER_ROTATION[i % OWNER_ROTATION.length];
+    holdings.push({
+      id: uid(), bookId: books[i].id,
+      holdingType: isCompany ? "COMPANY" : "PERSONAL",
+      ownerId: isCompany ? null : owner,
+      ownerDisplayName: isCompany ? "会社" : owner,
+      location: isCompany ? `本棚${String.fromCharCode(65 + (i % 4))}` : `${owner}の席`,
+      visibility: "LOAN_AVAILABLE", loanAllowed: true,
+      currentHolderId: owner, currentHolderDisplayName: owner,
+      status: "AVAILABLE", availableFrom: null,
+    });
+  }
+  // 数冊は貸出中の状態にして、貸出待ち等のデモがしやすいようにする
+  [5, 10, 15, 20].forEach((idx) => {
+    if (holdings[idx]) { holdings[idx].status = "ON_LOAN"; }
+  });
+
   const loans = [
     { id: uid(), holdingId: holdings[0].id, borrowerId: "山田", borrowedAt: addDays(todayStr(), -5), dueAt: addDays(todayStr(), 9), returnedAt: null, status: "ACTIVE" },
     { id: uid(), holdingId: holdings[2].id, borrowerId: "佐藤", borrowedAt: addDays(todayStr(), -20), dueAt: addDays(todayStr(), -6), returnedAt: null, status: "ACTIVE" },
   ];
+  [5, 10, 15, 20].forEach((idx) => {
+    const h = holdings[idx];
+    if (h && h.status === "ON_LOAN") {
+      loans.push({ id: uid(), holdingId: h.id, borrowerId: h.currentHolderId, borrowedAt: addDays(todayStr(), -3), dueAt: addDays(todayStr(), 11), returnedAt: null, status: "ACTIVE" });
+    }
+  });
   return {
     books, holdings, loans,
     borrowRequests: [], relayRequests: [], reviews: [], purchaseRequests: [],
