@@ -26,6 +26,7 @@
   --radius: 10px;
 }
 * { box-sizing: border-box; }
+html, body { max-width: 100%; overflow-x: hidden; }
 body {
   margin: 0;
   font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
@@ -56,6 +57,21 @@ header h1 {
 }
 .brand-mark { flex-shrink: 0; }
 .accent-bar { height: 4px; background: var(--wood); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.presentation-link {
+  color: var(--wood-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.presentation-link:hover { color: var(--ink); }
 
 .user-switch {
   font-size: 0.85rem;
@@ -177,6 +193,7 @@ h3 { margin: 4px 0; font-weight: 700; }
   display: flex;
   flex-direction: column;
   font-family: inherit;
+  min-width: 0;
 }
 .home-shelf-illust {
   display: flex;
@@ -184,6 +201,7 @@ h3 { margin: 4px 0; font-weight: 700; }
   gap: 4px;
   padding: 18px 16px 12px;
   min-height: 90px;
+  overflow: hidden;
 }
 .home-mini-spine { border-radius: 2px 2px 0 0; flex-shrink: 0; }
 .home-cell-label {
@@ -194,6 +212,7 @@ h3 { margin: 4px 0; font-weight: 700; }
   border-top: 1px solid var(--line);
 }
 .home-cell-label .icon { color: var(--wood-dark); flex-shrink: 0; }
+.home-cell-label .text { min-width: 0; }
 .home-cell-label .text b { display: block; font-size: 0.95rem; color: var(--ink); }
 .home-cell-label .text span { display: block; font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
 .home-cell:hover { background: #f5efe0; }
@@ -371,6 +390,77 @@ input:focus, select:focus, textarea:focus {
   min-width: 140px;
 }
 .stat-box .num { font-size: 1.7rem; font-weight: 700; color: var(--wood-dark); }
+.presentation-lead {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  margin-bottom: 22px;
+}
+.presentation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+.presentation-grid .card { margin-bottom: 0; }
+.presentation-grid ul { margin: 10px 0 0; padding-left: 1.3rem; }
+.presentation-grid li { margin: 6px 0; }
+.architecture-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.architecture-flow span {
+  background: var(--line);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.architecture-flow i { color: var(--wood-dark); font-style: normal; }
 .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
 .checkbox-row input { width: auto; }
 .holding-block { border: 1px dashed var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 8px; }
+
+/* ================= スマートフォン向け ================= */
+@media (max-width: 640px) {
+  header { padding: 14px 16px; }
+  header h1 { font-size: 1rem; }
+  .user-switch { font-size: 0.78rem; }
+
+  nav {
+    padding: 0 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  nav button {
+    padding: 10px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  main { padding: 16px 12px 40px; }
+  .card { padding: 14px; }
+
+  h2 { font-size: 1.05rem; margin-bottom: 16px; }
+
+  .home-frame { border-width: 4px; border-radius: 16px; padding: 14px 14px 6px; }
+  .home-grid { grid-template-columns: repeat(2, 1fr); }
+  .home-shelf-illust { padding: 12px 10px 8px; min-height: 70px; gap: 3px; }
+  .home-cell-label { padding: 10px 10px 12px; gap: 8px; }
+  .home-cell-label .icon { width: 18px; height: 18px; }
+  .home-cell-label .text b { font-size: 0.82rem; }
+  .home-cell-label .text span { font-size: 0.66rem; }
+
+  .row { flex-direction: column; }
+  .row > div { min-width: 0; width: 100%; }
+
+  .shelf-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+}
+
+@media (max-width: 420px) {
+  .home-grid { grid-template-columns: 1fr; }
+}

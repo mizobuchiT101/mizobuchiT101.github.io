@@ -202,11 +202,16 @@ function loadState() {
 function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
 let state = loadState();
-let currentView = "home";
+let currentView = window.location.hash === "#presentation" ? "presentation" : "home";
 let currentParam = null;
 
 function setView(view, param) {
   currentView = view; currentParam = param || null;
+  if (view === "presentation") {
+    window.history.replaceState(null, "", "#presentation");
+  } else if (window.location.hash === "#presentation") {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
   document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
   render();
 }
@@ -214,6 +219,11 @@ function setView(view, param) {
 document.getElementById("nav").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-view]");
   if (btn) setView(btn.dataset.view);
+});
+
+document.getElementById("presentationLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  setView("presentation");
 });
 
 const userSelect = document.getElementById("currentUser");
@@ -244,6 +254,7 @@ function render() {
     shelf: renderShelf, detail: renderDetail, register: renderRegister,
     loan: renderLoan, relay: renderRelay, wishlist: renderWishlist,
     mypage: renderMyPage, notify: renderNotify, manual: renderManual,
+    presentation: renderPresentation,
   };
   main.appendChild(views[currentView]());
 }
@@ -1233,6 +1244,60 @@ function renderManual() {
     <div class="card"><h3>${s.title}</h3><p>${s.body}</p></div>
   `).join("");
   return wrap;
+}
+
+// ---------- 社内発表用：技術・将来構成・工夫点 ----------
+function renderPresentation() {
+  return el(`<div>
+    <h2>このアプリの技術・将来構成・工夫点</h2>
+    <p class="presentation-lead">会社の本と社員が任意共有する本を、人から人へつなぐ社内書籍ポータルです。現在はAWS認証情報なしで動くローカルMockとして実装しています。</p>
+
+    <div class="presentation-grid">
+      <section class="card">
+        <h3>現在の使用技術</h3>
+        <ul>
+          <li>HTML / CSS / JavaScriptによるフロントエンド</li>
+          <li>localStorageによるMockデータ保存</li>
+          <li>Canvas APIによるしおり画像生成Mock</li>
+          <li>ルールベースのAI類似検索・Reading Load・読書カレー</li>
+          <li>外部API・AWS認証情報なしでローカル起動</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>将来のAWS構成</h3>
+        <ul>
+          <li>React / TypeScript / Vite</li>
+          <li>AWS Amplify Hosting</li>
+          <li>API Gateway + Lambda</li>
+          <li>DynamoDB / Cognito / S3</li>
+          <li>Amazon Bedrockによる検索・分析・画像生成</li>
+          <li>EventBridge / SES / SNSによる通知拡張</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>主な工夫点</h3>
+        <ul>
+          <li>BookとHoldingを分け、同じ本と物理的な一冊を別管理</li>
+          <li>会社所有と私物を区別し、私物共有は本人のOpt-in方式</li>
+          <li>「次に借りたい」Pull型と「リレー」Push型を両立</li>
+          <li>貸出待ち順を優先する設計</li>
+          <li>本棚UIとサイズ比例表示</li>
+          <li>Reading Loadや読書カレーで本の特徴を楽しく可視化</li>
+          <li>AI背景と正確な会社名文字を分けて合成するしおり設計</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <h3>MockからAWSへ</h3>
+      <div class="architecture-flow">
+        <span>ブラウザMock</span><i>→</i><span>React + Amplify</span><i>→</i><span>API Gateway + Lambda</span><i>→</i><span>DynamoDB / Bedrock / S3</span>
+      </div>
+      <p class="note" style="margin-top:16px;">現在のAWS構成は設計のみです。今回のワークショップでは実際のAWS構築・デプロイは行っていません。</p>
+    </section>
+  </div>`);
 }
 
 render();
