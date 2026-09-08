@@ -1,0 +1,376 @@
+/*
+  デザインコンセプト: あたたかい木の本棚
+  生成りのクリーム背景 + オーク材のような木目トーン + パステルな背表紙カラー。
+  ホーム画面は「本棚の小部屋」を模したタイル型メニューにしている。
+*/
+:root {
+  --bg: #f2ead9;
+  --surface: #faf6ec;
+  --wood: #c9a876;
+  --wood-dark: #a9824f;
+  --ink: #2a2622;
+  --ink-soft: #7c7160;
+  --line: #e7dcc2;
+
+  --spine-brown: #8b7355;
+  --spine-rose: #c98a7d;
+  --spine-navy: #4a5568;
+  --spine-sage: #94ab7f;
+  --spine-gold: #d4a53f;
+  --spine-terracotta: #c1654f;
+  --spine-blue: #8fa8bf;
+
+  --plant-green: #8fae6d;
+  --plant-pot: #bf6a4d;
+  --danger: #b1493a;
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+header {
+  background: var(--surface);
+  color: var(--ink);
+  padding: 18px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+}
+header h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-mark { flex-shrink: 0; }
+.accent-bar { height: 4px; background: var(--wood); }
+
+.user-switch {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+}
+.user-switch select {
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: var(--surface);
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+nav button {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-soft);
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+nav button:hover { color: var(--ink); }
+nav button.active { color: var(--ink); border-bottom-color: var(--wood-dark); }
+
+main { padding: 28px 24px 60px; max-width: 1020px; margin: 0 auto; }
+
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 4px 0 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--wood-dark);
+  flex-shrink: 0;
+}
+h3 { margin: 4px 0; font-weight: 700; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+/* ================= ホーム画面(本棚の小部屋メニュー) ================= */
+.home-frame {
+  background: var(--surface);
+  border: 6px solid var(--wood);
+  border-radius: 22px;
+  padding: 22px 22px 8px;
+  box-shadow: 0 10px 30px rgba(169, 130, 79, 0.18);
+}
+.home-frame-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 6px 18px;
+  position: relative;
+}
+.home-frame-header h2 {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.home-frame-header h2::before { display: none; }
+.home-subtitle {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.home-dots { position: absolute; right: 6px; top: 4px; display: flex; gap: 6px; }
+.home-dots span { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.home-dots span:nth-child(1) { background: #e0645a; }
+.home-dots span:nth-child(2) { background: #e8b84b; }
+.home-dots span:nth-child(3) { background: #8fae6d; }
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 3px solid var(--wood);
+  border-left: 3px solid var(--wood);
+}
+.home-cell {
+  background: var(--surface);
+  border-right: 3px solid var(--wood);
+  border-bottom: 3px solid var(--wood);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+.home-shelf-illust {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 18px 16px 12px;
+  min-height: 90px;
+}
+.home-mini-spine { border-radius: 2px 2px 0 0; flex-shrink: 0; }
+.home-cell-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+.home-cell-label .icon { color: var(--wood-dark); flex-shrink: 0; }
+.home-cell-label .text b { display: block; font-size: 0.95rem; color: var(--ink); }
+.home-cell-label .text span { display: block; font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
+.home-cell:hover { background: #f5efe0; }
+
+/* ---- 本棚: 表示切替 ---- */
+.shelf-toggle {
+  display: inline-flex;
+  border: 1px solid var(--wood);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.shelf-toggle button {
+  border: none;
+  background: var(--surface);
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  border-right: 1px solid var(--wood);
+}
+.shelf-toggle button:last-child { border-right: none; }
+.shelf-toggle button.active { background: var(--wood-dark); color: #fff; }
+
+/* ---- グリッド表示(標準) ---- */
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+.book {
+  position: relative;
+  border-radius: var(--radius);
+  border: none;
+  border-top: 6px solid var(--wood);
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  font-size: 0.78rem;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.12s ease;
+}
+.book:hover { transform: translateY(-3px); }
+.book b { font-size: 0.86rem; line-height: 1.35; display: block; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+
+/* ---- 実寸(サイズ比例)表示 ---- */
+.spine-shelf-outer {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 20px 0;
+  overflow-x: auto;
+}
+.spine-shelf {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  min-height: 260px;
+  padding-bottom: 16px;
+  border-bottom: 6px solid var(--wood);
+}
+.spine {
+  border: none;
+  border-radius: 2px 2px 0 0;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10px 4px;
+  transition: transform 0.12s ease;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.spine:hover { transform: translateY(-4px); }
+.spine-caption {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  padding: 10px 0 2px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--line);
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--radius);
+  margin: 2px 4px 2px 0;
+}
+.tag.status-AVAILABLE { background: var(--spine-sage); color: #fff; }
+.tag.status-ON_LOAN { background: var(--spine-gold); color: #4a3400; }
+.tag.status-UNAVAILABLE { background: var(--line); color: var(--ink-soft); }
+.tag.type-COMPANY { background: var(--spine-navy); color: #fff; }
+.tag.type-PERSONAL { background: var(--spine-rose); color: #fff; }
+.tag.curry { background: var(--wood-dark); color: #fff; }
+.tag.overdue { background: var(--danger); color: #fff; }
+.tag.ai { background: var(--spine-blue); color: #fff; }
+
+label { display: block; font-size: 0.8rem; margin: 10px 0 4px; color: var(--ink-soft); font-weight: 600; }
+input, select, textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--ink);
+  transition: border-color 0.15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--wood-dark);
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 12px;
+  background: var(--wood-dark);
+  color: #fff;
+  border: 1px solid var(--wood-dark);
+  padding: 9px 18px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+.btn:hover { background: #8c6a3f; }
+.btn.secondary { background: transparent; color: var(--wood-dark); border: 1px solid var(--wood-dark); }
+.btn.secondary:hover { background: #f5efe0; }
+.btn.danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+.btn.danger:hover { background: var(--danger); color: #fff; }
+.btn.small { padding: 5px 12px; margin-left: 8px; margin-top: 0; font-size: 0.78rem; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.row { display: flex; gap: 14px; flex-wrap: wrap; }
+.row > div { flex: 1; min-width: 200px; }
+.note { font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px; }
+.list-item { border-bottom: 1px solid var(--line); padding: 10px 0; }
+.list-item:last-child { border-bottom: none; }
+.back-link {
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.back-link:hover { color: var(--wood-dark); }
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--wood);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  flex: 1;
+  min-width: 140px;
+}
+.stat-box .num { font-size: 1.7rem; font-weight: 700; color: var(--wood-dark); }
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.checkbox-row input { width: auto; }
+.holding-block { border: 1px dashed var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 8px; }

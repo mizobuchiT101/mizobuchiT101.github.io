@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社内書籍ポータル</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1><svg class="brand-mark" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+    <rect x="2" y="8" width="5" height="14" fill="#8b7355"/>
+    <rect x="9" y="4" width="5" height="18" fill="#d4a53f"/>
+    <rect x="16" y="10" width="5" height="12" fill="#4a5568"/>
+  </svg>社内書籍ポータル</h1>
+  <div class="user-switch">
+    ログインユーザー:
+    <select id="currentUser"></select>
+  </div>
+</header>
+<div class="accent-bar" aria-hidden="true"></div>
+
+<nav id="nav">
+  <button data-view="home" class="active">ホーム</button>
+  <button data-view="shelf">本棚</button>
+  <button data-view="register">登録</button>
+  <button data-view="loan">貸出・返却・貸出待ち</button>
+  <button data-view="relay">リレー(バトン読書)</button>
+  <button data-view="wishlist">購入希望</button>
+  <button data-view="mypage">マイページ</button>
+  <button data-view="notify">通知プレビュー</button>
+  <button data-view="manual">操作マニュアル</button>
+</nav>
+
+<main id="main"></main>
+
+<script src="app.js"></script>
+</body>
+</html>
